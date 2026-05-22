@@ -25,3 +25,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false, error: error.message }, { status: 400 });
   }
 }
+
+// GET: Fetch all upcoming events
+export async function GET() {
+  try {
+    const allEvents = await prisma.event.findMany({
+      orderBy: { date: 'asc' }, // Sort by closest date first
+      include: {
+        // This automatically fetches the name of the Organizer for each event!
+        organizer: { select: { fullName: true, organizationName: true } }
+      }
+    });
+
+    return NextResponse.json({ success: true, events: allEvents }, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 400 });
+  }
+}
